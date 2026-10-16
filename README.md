@@ -83,10 +83,50 @@ On Kaggle, the same `data/processed/` and `report/member4_artifacts/` folders ar
 copy the required figures/tables into the final report. Section 4's saved outputs come from the
 matching real F1 data. Separate synthetic checks were kept outside the shared notebook.
 
-The full 101-cell notebook passed a local Run All in a fresh kernel. Validation selected logistic
+The initial 101-cell benchmark passed a local Run All in a fresh kernel. Validation selected logistic
 regression (AP `0.7157`, threshold `0.2462`); its final test AP is `0.7115` and F1 is `0.6654`.
 Those settings were frozen before test reporting. Kaggle execution still needs the team's final
 integration check.
+
+## Follow-up neural tuning and gradient boosting (Section 4.11)
+
+The appended section keeps the original benchmark as a reference and runs a bounded search:
+16 neural-network configurations and 18 gradient-boosting configurations, followed by a paired
+neural seed check using 0, 47, and 101. Each stage keeps its successful and unsuccessful trials.
+Run All reruns this search from the data; it does not require cached models or external trial files.
+Allow several minutes on CPU.
+
+At the original seed 47, validation AP improved from `0.7020` for the original neural network to
+`0.7345` for a single 32-unit hidden layer, with epoch 55 selected by validation AP. Across the three
+paired seeds, mean AP improved from `0.7157` to `0.7259`; the tuned model won two of the three pairs.
+The selected gradient booster reached AP `0.7230`. At exactly matched validation recall
+(`82/117`, or `70.09%`), boosting had the highest precision (`0.7257`, versus logistic regression's
+`0.7009`), with 31 false positives versus 35. See `matched_recall_comparison.csv` for all five models.
+Nearby refinements did not beat the selected APs, so the search stops with these simple candidates.
+
+All new fitting, epoch selection, thresholds, and model comparisons use the original training and
+validation splits. The initial test figures had already been inspected before this follow-up was
+requested, so the appendix deliberately makes **no new test predictions**. Its winning validation
+scores are exploratory and optimistic after selection, not fresh unseen-test estimates.
+
+The search keeps PR-AUC (average precision) primary. Its secondary table and comparison chart
+measure precision at exactly the same achieved recall for every model: the smallest shared
+true-positive count at or above 70% recall. This handles finite samples and tied scores without
+interpolating predictions. The earlier best-precision-at-recall>=70% table is also retained and
+reports actual recall. The selected network and boosting candidate each have validation confusion
+matrices for the F1-selected and precision-focused thresholds, probability plots, and comparison figures.
+
+The original `final_model` remains the benchmark model. New objects are `tuned_nn_model`,
+`gradient_boosting_model`, and `followup_model`, with `followup_threshold` and
+`followup_selective_threshold`. Results, all settings, seed checks, and `tuning_report.md` are
+exported under `report/member4_artifacts/tuning/`.
+
+The neural network remains one or two hidden layers. Gradient boosting uses scikit-learn's
+[histogram implementation](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingClassifier.html)
+and two ordinary-gradient-boosting controls. The selected neural epoch is measured with exact
+validation AP through a standard [Keras callback](https://keras.io/guides/writing_your_own_callbacks/).
+Wider/deeper models and additional tuning are retained only as measured comparisons; a finite
+search does not establish a globally optimal model.
 
 ## Handoff to Member 2
 
