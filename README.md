@@ -59,6 +59,9 @@ use the initialization commands above; the notebook records the versions used fo
   and test 2022–2024. It fits fresh preprocessing on training rows only.
 - Shows four attempts in separate cells: logistic regression, an unrestricted random forest,
   a regularized forest, and a one-hidden-layer TensorFlow/Keras network.
+- Each attempt displays a validation confusion matrix and a histogram of predicted probabilities
+  grouped by actual outcome, with its selected threshold marked. The final test figure includes
+  a confusion matrix for each of the three selected model families.
 - Uses PR-AUC (average precision) as primary and F1 as secondary. Reports ROC-AUC, PR-AUC,
   F1, precision, and recall, including threshold-0.5 versus validation-selected F1.
 - Selects the forest configuration, model family, and thresholds on validation only. Evaluates
