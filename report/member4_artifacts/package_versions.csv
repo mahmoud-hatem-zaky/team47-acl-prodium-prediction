@@ -1,0 +1,6 @@
+package,version
+python,3.11.14
+numpy,2.4.6
+pandas,3.0.6
+scikit-learn,1.9.1
+tensorflow,2.21.0
